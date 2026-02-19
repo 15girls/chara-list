@@ -1,0 +1,130 @@
+/* ==========================================================================
+   DEAD or ALIVE - Redemption Arc Theme
+   Load AFTER base.css
+   ========================================================================== */
+
+:root{
+
+  /* Background */
+  --bg: linear-gradient(
+          180deg,
+          #f4f7fb 0%,
+          #eef2f7 40%,
+          #e9edf3 100%
+        );
+
+  /* Text */
+  --text: #1c2430;
+  --muted: rgba(0,0,0,.55);
+
+  /* Panels */
+  --panel: rgba(255,255,255,.70);
+  --panel2: rgba(255,255,255,.92);
+  --line: rgba(0,0,0,.12);
+
+  /* Shadows */
+  --shadow: 0 12px 28px rgba(0,0,0,.12);
+
+  /* Card radius slightly softer */
+  --radius: 14px;
+
+  /* Tile size */
+  --tile-min: 175px;
+
+  /* Status colors */
+  --dead: #c62828;
+  --leave: #2b7de9;
+}
+
+/* ---- Page tweak -------------------------------------------------------- */
+
+body{
+  background: var(--bg);
+}
+
+/* ---- Logo contrast (白背景でも映えるよう少し影) ---------------------- */
+
+.logo-container img{
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.18));
+}
+
+/* ---- HUD --------------------------------------------------------------- */
+
+.hudjp .row{
+}
+
+.hudjp span{
+  color: rgba(0,0,0,.55);
+}
+
+.hudjp b{
+  color: #111;
+}
+
+.hudjp i{
+  color: rgba(0,0,0,.55);
+}
+
+/* 死亡 色補正 */
+
+.hudjp .dead b{
+  color: var(--dead);
+}
+
+.hudjp le b{
+  color: (--le);
+}
+
+
+
+/* ---- Grid -------------------------------------------------------------- */
+
+.grid-container{
+  padding-top: 6px;
+}
+
+/* ---- Cards ------------------------------------------------------------- */
+
+.char-card{
+
+  background: linear-gradient(
+    180deg,
+    rgba(204 206,209,1),
+    rgb(245,246,246)
+	);
+
+  border: 1px solid rgba(0,0,0,.10);
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.70);
+}
+
+
+
+/* Image */
+
+.char-card img{
+  background: #dfe5ec;
+  filter: contrast(1.02) saturate(1.02);
+}
+
+/* Name */
+
+.char-name{
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* ---- States ---------------------------------------------- */
+
+
+/* ---- Mobile polish ----------------------------------------------------- */
+
+@media (max-width: 420px){
+
+  .char-card{
+    box-shadow: 0 6px 14px rgba(0,0,0,.10);
+  }
+
+}
