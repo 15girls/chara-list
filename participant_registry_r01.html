@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>登場人物一覧</title>
+
+  <style>
+    :root{
+      --bg: #0c0f14;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.10);
+      --line: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.62);
+      --shadow: 0 18px 55px rgba(0,0,0,.45);
+      --radius: 16px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      padding: 28px 18px 42px;
+      background:
+        radial-gradient(900px 600px at 12% 8%, rgba(160,45,60,.25), transparent 55%),
+        radial-gradient(800px 520px at 92% 18%, rgba(75,120,200,.22), transparent 58%),
+        linear-gradient(180deg, #07090c, var(--bg));
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+                   "Hiragino Kaku Gothic ProN", "Noto Sans JP", Arial, sans-serif;
+    }
+
+    /* うっすら “極秘資料” っぽいヘッダ */
+    header{
+      max-width: 1200px;
+      margin: 0 auto 18px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .header-top{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stamp{
+      font-size: 12px;
+      letter-spacing: .14em;
+      color: var(--muted);
+      text-transform: uppercase;
+      user-select: none;
+    }
+    h1{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: .08em;
+      font-weight: 700;
+    }
+
+    /* タイル状グリッド */
+    .grid-container{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4px;
+    }
+
+    /* カード */
+    .char-card{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: 0 12px 28px rgba(0,0,0,.35);
+      overflow: hidden;
+      transform: translateZ(0);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .char-card:hover{
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,.28);
+      box-shadow: 0 18px 42px rgba(0,0,0,.45);
+    }
+
+    /* 画像を“タイルっぽく”綺麗に統一 */
+    .char-card img{
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: rgba(0,0,0,.25);
+      filter: contrast(1.02) saturate(1.02);
+    }
+
+    /* 名前だけ */
+    .char-name{
+      padding: 10px 10px 12px;
+      text-align: center;
+      font-size: 14px;
+      letter-spacing: .06em;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 画面が狭い時の詰まりを少し緩める */
+    @media (max-width: 420px){
+      body{ padding: 20px 12px 34px; }
+      .grid-container{ grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); }
+      h1{ font-size: 16px; }
+    }
+
+    /* ユーザーが設定してる場合、動きを減らす */
+    @media (prefers-reduced-motion: reduce){
+      .char-card{ transition: none; }
+      .char-card:hover{ transform: none; }
+    }
+	
+	/* ===== badges / marks ===== */
+.char-card{ position: relative; }
+
+.badges{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.badge{
+  font-size: 11px;
+  letter-spacing: .08em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(0,0,0,.35);
+  color: rgba(255,255,255,.88);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35);
+}
+
+
+.badge.participant{
+  border-color: rgba(255, 90, 90, .75);
+  background: linear-gradient(
+    135deg,
+    rgba(210, 40, 40, .88),
+    rgba(160, 25, 25, .88)
+  );
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,.55);
+    box-shadow: 0 4px 10px rgba(0,0,0,.35);
+}
+
+
+.badge.staff{
+  border-color: rgba(200, 210, 230, .40);
+  background: rgba(20, 24, 34, .70);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,.35);
+}
+
+
+.badge.intruder{
+  border-color: rgba(70, 230, 210, .75);
+  background: linear-gradient(
+    135deg,
+    rgba(40, 190, 200, .88),
+    rgba(20, 140, 170, .88)
+  );
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,.55);
+  box-shadow: 0 4px 10px rgba(0,0,0,.35);
+}
+
+
+.mark{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  pointer-events: none;
+
+  font-size: 11px;
+  letter-spacing: .16em;
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.90);
+  backdrop-filter: blur(8px);
+}
+
+.mark.sub{
+  border: 1px solid rgba(255, 210, 70, 0.70);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 70, 0.95),
+    rgba(240, 170, 40, 0.95)
+  );
+  color: rgba(30, 20, 0, 0.95);
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255,255,255,.35);
+  box-shadow: 0 6px 14px rgba(0,0,0,.35);
+}
+
+.legend{
+  max-width: 1200px;
+  margin: 10px auto 14px;
+  padding: 0 6px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.62);
+}
+
+
+/* ===== Modal ===== */
+.modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 9999;
+}
+
+.modal.is-open{ display: flex; }
+
+.modal-overlay{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(6px);
+}
+
+.modal-panel{
+  position: relative;
+  width: min(920px, 96vw);
+  max-height: min(86vh, 860px);
+  overflow: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: linear-gradient(180deg, rgba(18,22,32,.92), rgba(10,12,18,.92));
+  box-shadow: 0 30px 90px rgba(0,0,0,.6);
+  color: rgba(255,255,255,.92);
+}
+
+.modal-close{
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 10px 0;
+  z-index: 2;
+}
+
+.modal-close button{
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.92);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.modal-body{
+  padding: 12px 16px 18px;
+}
+
+/* モーダル内のカードを少し整える（最低限） */
+.modal-panel img{
+  max-width: 100%;
+  height: auto;
+}
+
+
+/* ===== Character Detail (modal only) ===== */
+.modal-body .chara-name{
+  margin: 4px 0 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+.modal-body .chara-name ruby rt{
+  font-size: 12px;
+  letter-spacing: .10em;
+  color: rgba(255,255,255,.70);
+}
+
+.modal-body .chara-card{
+  margin-top: 12px;
+}
+
+.modal-body .chara-layout{
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* 画像枠：白背景でも浮かない */
+.modal-body .chara-portrait{
+  margin: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.04);
+  box-shadow: 0 18px 40px rgba(0,0,0,.45);
+}
+
+.modal-body .chara-portrait img{
+  width: 100%;
+  display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* 年齢/血液型…：横並びの資料表 */
+.modal-body .chara-stats{
+  margin: 0 0 14px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.modal-body .chara-stats dt{
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.16);
+  color: rgba(255,255,255,.92);
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.modal-body .chara-stats dd{
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+  font-weight: 650;
+  letter-spacing: .04em;
+}
+
+.modal-body .chara-tagline{
+  margin: 10px 0 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.92);
+}
+
+.modal-body .chara-desc{
+  margin: 0 0 10px;
+  line-height: 1.85;
+  color: rgba(255,255,255,.82);
+}
+
+@media (max-width: 720px){
+  .modal-body .chara-layout{
+    grid-template-columns: 1fr;
+  }
+  .modal-body .chara-stats{
+    grid-template-columns: 140px 1fr;
+  }
+}
+.modal-body .chara-note{
+  margin: 6px 0 0;
+  font-size: 12px;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.62);
+}
+
+	
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-top">
+      <h1>登場人物一覧</h1>
+      <div class="stamp">CONFIDENTIAL / READER’S INDEX</div>
+    </div>
+  </header>
+
+<p class="legend">
+  SUB = サブキャラクター（視点なし）
+</p>
+
+  <main class="grid-container">
+
+	<div class="char-card" onclick="openModal('modal-misame')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+	  <img src="200/misame.webp" alt="神崎美雨">
+	  <div class="char-name">神崎美雨</div>
+	</div>
+
+
+   <div class="char-card" onclick="openModal('modal-keiko')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/keiko.webp" alt="茂木螢子">
+      <div class="char-name">茂木螢子</div>
+    </div>
+
+
+<div class="char-card" onclick="openModal('modal-rie')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/rie.webp" alt="佐倉莉永">
+      <div class="char-name">佐倉莉永</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-kotone')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/kotone.webp" alt="不知火琴音">
+      <div class="char-name">不知火琴音</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-seika')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/seika.webp" alt="櫪星歌">
+      <div class="char-name">櫪星歌</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-ayame')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/ayame.webp" alt="幸坂綾女">
+      <div class="char-name">幸坂綾女</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-remi')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/remi.webp" alt="吉沢麗美">
+      <div class="char-name">吉沢麗美</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-kyouko')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/kyouko.webp" alt="水鳥鏡子">
+      <div class="char-name">水鳥鏡子</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-maaya')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/maaya.webp" alt="木滝真紋">
+      <div class="char-name">木滝真紋</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-chiriko')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/chiriko.webp" alt="榊千理子">
+      <div class="char-name">榊千理子</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-sayuri')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/sayuri.webp" alt="渋谷紗悠里">
+      <div class="char-name">渋谷紗悠里</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-manae')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/manae.webp" alt="中谷真苗">
+      <div class="char-name">中谷真苗</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-ako')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/ako.webp" alt="高見沢亜子">
+      <div class="char-name">高見沢亜子</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-miyuki')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/miyuki.webp" alt="矢沢深雪">
+      <div class="char-name">矢沢深雪</div>
+    </div>
+
+    <div class="char-card" onclick="openModal('modal-tomo')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge participant">参加者</span>
+	  </div>
+      <img src="200/tomo.webp" alt="八王子智">
+      <div class="char-name">八王子智</div>
+    </div>
+
+
+	<div class="char-card" onclick="openModal('modal-mizuki')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge staff">関係者</span>
+	  </div>
+      <img src="200/mizuki.webp" alt="横山瑞希">
+      <div class="char-name">横山瑞希</div>
+    </div>
+
+
+	<div class="char-card" onclick="openModal('modal-kayama')" role="button" tabindex="0">
+	  <div class="badges">
+	    <span class="badge staff">関係者</span>
+	  </div>
+	  <div class="mark sub">SUB</div>
+	  <img src="200/kayama.webp" alt="加山了一">
+	  <div class="char-name">加山了一</div>
+	</div>
+
+
+  </main>
+
+<!-- ===== Modals ===== -->
+
+<!-- ===== Modal (Misame) ===== -->
+<div id="modal-misame" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="神崎美雨 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- ↓ここに「美雨の情報カードHTML」をそのまま貼る -->
+
+<h3 class="chara-name">
+  <ruby>神崎 美雨<rp>(</rp><rt>かんざき　みさめ</rt><rp>)</rp></ruby>
+</h3>
+
+<div class="chara-card">
+  <div class="chara-layout">
+    <figure class="chara-portrait">
+      <img src="original/01.webp" alt="神崎美雨">
+    </figure>
+
+    <div class="chara-info">
+      <dl class="chara-stats">
+        <dt>年齢</dt><dd>28歳</dd>
+        <dt>血液型</dt><dd>AB型</dd>
+        <dt>誕生日</dt><dd>12/28</dd>
+        <dt>身長</dt><dd>160cm</dd>
+      </dl>
+
+      <p class="chara-tagline">才色兼備の天才殺人者</p>
+
+      <p class="chara-desc">
+        名門大学の医学部卒。優秀な成績を残し、若手ながら医師としても期待されていた。<br>
+        その頭脳、ひいては犯罪の完全性から「天才」と呼ばれるシリアルキラー。
+      </p>
+    </div>
+  </div>
+</div>
+
+      <!-- ↑ここまで -->
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- ===== Modal: Keiko ===== -->
+<div id="modal-keiko" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="◆茂木螢子 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>茂木 螢子<rp>(</rp><rt>もてぎ　けいこ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/02.webp" alt="茂木螢子">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>23歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>9/15</dd>
+              <dt>身長</dt><dd>155cm</dd>
+            </dl>
+
+            <p class="chara-tagline">ドライな殺人アルバイト</p>
+
+            <p class="chara-desc">
+		一般家庭に生まれ、高校卒業後はフリーターとして生活していた。<br>
+		犯罪に関与した経緯は不明。本人は、ある組織の指示で行ったと供述しているが、
+その組織の実在は現在まで確認されていない。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- ===== Modal: Rie ===== -->
+<div id="modal-rie" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="佐倉莉永 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>佐倉 莉永<rp>(</rp><rt>さくら　りえ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/03.webp" alt="佐倉莉永">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>18歳</dd>
+              <dt>血液型</dt><dd>O型</dd>
+              <dt>誕生日</dt><dd>10/14</dd>
+              <dt>身長</dt><dd>151cm</dd>
+            </dl>
+
+            <p class="chara-tagline">ゴーイングマイウェイ</p>
+
+            <p class="chara-desc">
+		愛嬌のある性格と可愛らしい外見を持つ「不良」な女子高校生。<br>
+		援助交際の相手を殺害し、金品を奪って逃走していた経歴を持つ少女。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Kotone ===== -->
+<div id="modal-kotone" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="不知火琴音 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>不知火 琴音<rp>(</rp><rt>しらぬい　ことね</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/04.webp" alt="不知火琴音">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>24歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>5/3</dd>
+              <dt>身長</dt><dd>160cm</dd>
+            </dl>
+
+            <p class="chara-tagline">宿命を背負う令嬢</p>
+
+            <p class="chara-desc">
+		名家「不知火財閥」の血筋を継ぐ令嬢だった女性。<br>
+		館の奥か社交界でしか姿を見せない、世俗から隔てられた存在だった。<br>
+		長い前髪で隠された左目には義眼をつけている。<br>
+		穏やかな物腰の奥に、頑なな信念を秘めている。
+</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Seika ===== -->
+<div id="modal-seika" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="櫪星歌 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>櫪 星歌<rp>(</rp><rt>くすぎ　せいか</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/05.webp" alt="櫪星歌">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>22歳</dd>
+              <dt>血液型</dt><dd>AB型</dd>
+              <dt>誕生日</dt><dd>9/28</dd>
+              <dt>身長</dt><dd>173cm</dd>
+            </dl>
+
+            <p class="chara-tagline">主君に忠義を捧げる女武士</p>
+
+            <p class="chara-desc">
+		不知火琴音に仕える侍女。<br>
+幼い頃から不知火家に身を置き、侍女としての教育を受けてきた。<br>
+外の世界との関わりは少なく、その人生のすべてを主君への忠義に捧げている。
+</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Ayame ===== -->
+<div id="modal-ayame" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="幸坂綾女 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>幸坂 綾女<rp>(</rp><rt>こうさか　あやめ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/06.webp" alt="幸坂綾女">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>26歳</dd>
+              <dt>血液型</dt><dd>O型</dd>
+              <dt>誕生日</dt><dd>12/25</dd>
+              <dt>身長</dt><dd>157cm</dd>
+            </dl>
+
+            <p class="chara-tagline">修道服を纏う赤い悪魔</p>
+
+            <p class="chara-desc">
+		シスターでありながら、教会を訪れる信徒を殺害した罪により、非人道的な存在として世間から恐れられた。<br>
+常に携えているロザリオは、逆十字の形をしている。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Remi ===== -->
+<div id="modal-remi" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="吉沢麗美 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>吉沢 麗美<rp>(</rp><rt>よしざわ　れみ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/07.webp" alt="吉沢麗美">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>24歳</dd>
+              <dt>血液型</dt><dd>B型</dd>
+              <dt>誕生日</dt><dd>4/21</dd>
+              <dt>身長</dt><dd>165cm</dd>
+            </dl>
+
+            <p class="chara-tagline">暴走金髪カブライダー</p>
+
+            <p class="chara-desc">
+		父は日本人、母はアメリカ人で混血の帰国子女。<br>
+		バイクをこよなく愛しており、愛車は「スーパーカブ」。<br>
+		明るく良識ある人物だが、犯した罪について問われると、笑って話題を変えることが多い。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Kyouko ===== -->
+<div id="modal-kyouko" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="水鳥鏡子 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>水鳥 鏡子<rp>(</rp><rt>みとり　きょうこ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/08.webp" alt="水鳥鏡子">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>20歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>2/12</dd>
+              <dt>身長</dt><dd>156cm</dd>
+            </dl>
+
+            <p class="chara-tagline">幸せから追放された女</p>
+
+            <p class="chara-desc">
+		高校卒業後すぐに結婚。その夫を殺害し逃亡、指名手配される。<br>
+その後、放火事件の現場付近で逮捕され、同事件の容疑者として再逮捕された。<br>
+気が弱く、大人しい女性。<br>
+かつては幸せそうだと評判だった。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== Modal: Maaya ===== -->
+<div id="modal-maaya" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="木滝真紋 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>木滝 真紋<rp>(</rp><rt>きたき　まあや</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/09.webp" alt="木滝真紋">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>25歳</dd>
+              <dt>血液型</dt><dd>B型</dd>
+              <dt>誕生日</dt><dd>8/27</dd>
+              <dt>身長</dt><dd>152cm</dd>
+            </dl>
+
+            <p class="chara-tagline">真実を訴え続けるうたいびと</p>
+
+            <p class="chara-desc">
+		正義感の強いアーティスト。社会の闇に立ち向かい、国や政治家の不正を音楽に乗せて世に訴えていた。<br>
+しかし、政府の圧力によって身柄を拘束され、現代では希な「思想犯」として罰を与えられることになった。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Chiriko ===== -->
+<div id="modal-chiriko" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="榊千理子 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>榊 千理子<rp>(</rp><rt>さかき　ちりこ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/10.webp" alt="榊千理子">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>21歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>10/11</dd>
+              <dt>身長</dt><dd>163cm</dd>
+            </dl>
+
+            <p class="chara-tagline">歪んだ庇護の中で育った享楽者</p>
+
+            <p class="chara-desc">
+		権力者の父を持ち、甘やかされて育ってきた。<br>
+父の後ろ楯に守られ殺人行為を繰り返していたが、ある時その父に裏切られ逮捕される。<br>
+他者の苦痛を快楽として認識する、歪んだ性質を持つ。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Sayuri ===== -->
+<div id="modal-sayuri" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="渋谷紗悠里 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>渋谷 紗悠里<rp>(</rp><rt>しぶや　さゆり</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/11.webp" alt="渋谷紗悠里">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>17歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>6/12</dd>
+              <dt>身長</dt><dd>156cm</dd>
+            </dl>
+
+            <p class="chara-tagline">森羅万象に触れる少女</p>
+
+            <p class="chara-desc">
+		冷静で大人しく、人との干渉を避けながら生きてきた優等生タイプの女子高校生。<br>
+		在籍していた学校を倒壊させたとされる事件の中心人物。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- ===== Modal: Manae ===== -->
+<div id="modal-manae" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="中谷真苗 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>中谷 真苗<rp>(</rp><rt>なかたに　まなえ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/12.webp" alt="中谷真苗">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>20歳</dd>
+              <dt>血液型</dt><dd>B型</dd>
+              <dt>誕生日</dt><dd>1/31</dd>
+              <dt>身長</dt><dd>155cm</dd>
+            </dl>
+
+            <p class="chara-tagline">無垢なる快楽主義者</p>
+
+            <p class="chara-desc">
+		性行為中に相手を絞殺。その快楽に魅入られ、同じ手口の犯罪を重ねていった。<br>
+		自分の罪の重さを理解していない、極端な世間知らず。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Ako ===== -->
+<div id="modal-ako" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="高見沢亜子 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>高見沢 亜子<rp>(</rp><rt>たかみざわ　あこ</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/13.webp" alt="高見沢亜子">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>27歳</dd>
+              <dt>血液型</dt><dd>AB型</dd>
+              <dt>誕生日</dt><dd>5/20</dd>
+              <dt>身長</dt><dd>162cm</dd>
+            </dl>
+
+            <p class="chara-tagline">関西弁の凄腕クラッカー</p>
+
+            <p class="chara-desc">
+		ひきこもり。彼女の居場所はネット上であり、人と対面することは極端に苦手。<br>
+		天才的なクラッカーでもあり、彼女の手によって破壊されたデータの被害総額は計り知れない。<br>ネット上ではカリスマ的な存在「暴姫」として名を轟かせていた。
+</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Miyuki ===== -->
+<div id="modal-miyuki" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="矢沢深雪 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>矢沢 深雪<rp>(</rp><rt>やざわ　みゆき</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/14.webp" alt="矢沢深雪">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>28歳</dd>
+              <dt>血液型</dt><dd>O型</dd>
+              <dt>誕生日</dt><dd>3/2</dd>
+              <dt>身長</dt><dd>170cm</dd>
+            </dl>
+
+            <p class="chara-tagline">姉御肌のテロリスト</p>
+
+            <p class="chara-desc">
+		大学生時代に留学したアメリカで、テロリスト組織に所属。<br>
+		帰国後は組織の日本支部を設立し、国内での活動に従事してきた。<br>
+		実行に関与した事例は多くないが、リーダーとして指示を与えてきた罪は重い。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Tomo ===== -->
+<div id="modal-tomo" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="八王子智 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>八王子 智<rp>(</rp><rt>はちおうじ　とも</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/15.webp" alt="八王子智">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>16歳</dd>
+              <dt>血液型</dt><dd>B型</dd>
+              <dt>誕生日</dt><dd>4/21</dd>
+              <dt>身長</dt><dd>150cm</dd>
+            </dl>
+
+            <p class="chara-tagline">智 is カリスマ</p>
+
+            <p class="chara-desc">
+		思春期特有の感性を持つエゴイスト。<br>
+		明るく勝ち気な性格だが、素性が掴み難く、言動にも不可解な点が多い。<br>
+		天才殺人鬼である神崎美雨に憧れている。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== Modal: Mizuki ===== -->
+<div id="modal-mizuki" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="横山瑞希 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>横山 瑞希<rp>(</rp><rt>よこやま　みずき</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/16.webp" alt="横山瑞希">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>31歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>9/30</dd>
+              <dt>身長</dt><dd>165cm</dd>
+            </dl>
+
+            <p class="chara-tagline">裏の顔を持つやり手政治家</p>
+
+            <p class="chara-desc">
+		斬新な公約や派手なパフォーマンスで注目を浴びる若手女性政治家。<br>
+		紙タバコに強いこだわりを持つ愛煙家。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Modal: Kayama ===== -->
+<div id="modal-kayama" class="modal" aria-hidden="true">
+  <div class="modal-overlay" data-close></div>
+
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-label="加山了一 詳細">
+    <div class="modal-close">
+      <button type="button" data-close>×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3 class="chara-name">
+        <ruby>加山 了一<rp>(</rp><rt>かやま　りょういち</rt><rp>)</rp></ruby>
+      </h3>
+
+      <div class="chara-card">
+        <div class="chara-layout">
+
+          <figure class="chara-portrait">
+            <img src="original/32.webp" alt="加山了一">
+          </figure>
+
+          <div class="chara-info">
+
+            <dl class="chara-stats">
+              <dt>年齢</dt><dd>29歳</dd>
+              <dt>血液型</dt><dd>A型</dd>
+              <dt>誕生日</dt><dd>3/14</dd>
+              <dt>身長</dt><dd>180cm</dd>
+            </dl>
+
+            <p class="chara-tagline">エリート街道まっしぐら</p>
+
+            <p class="chara-desc">
+		横山瑞希の秘書。長身痩躯の青年。<br>冷静沈着で、補佐能力に優れる。
+            <p class="chara-note">※SUB CHARACTER（視点なし）</p>
+
+</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== End Modals ===== -->
+
+
+
+<script>
+  function openModal(id){
+    const m = document.getElementById(id);
+    if(!m) return;
+    m.classList.add("is-open");
+    m.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal(modalEl){
+    if(!modalEl) return;
+    modalEl.classList.remove("is-open");
+    modalEl.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  // 閉じる（×ボタン / 背景クリック）
+  document.addEventListener("click", (e) => {
+    const closeBtn = e.target.closest("[data-close]");
+    if(closeBtn){
+      const modal = e.target.closest(".modal") || document.querySelector(".modal.is-open");
+      closeModal(modal);
+    }
+  });
+
+  // ESCで閉じる
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape"){
+      const modal = document.querySelector(".modal.is-open");
+      closeModal(modal);
+    }
+  });
+</script>
+
+
+
+
+
+</body>
+</html>
